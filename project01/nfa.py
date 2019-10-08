@@ -3,6 +3,12 @@ EMPTY_STRING = ''
 def generate_state():
     return State()
 
+def generate_states(num_states):
+    ret_states = []
+    for i in range(0, num_states):
+        ret_states.append(generate_state())
+    return ret_states
+
 class State():
     id = 0
 
@@ -26,6 +32,8 @@ def union_t_function(t_function1, t_function2):
     for key in t_function2.keys():
         if key not in t_function:
             t_function[key] = t_function2[key]
+        else:
+            t_function[key] += t_function2[key]
     return t_function
 
 class NFA():
@@ -91,7 +99,12 @@ class NFA():
         Returns:
         Raises:
         """
-        self.states.insert(0, state)
+        if state not in self.states:
+            self.states.insert(0, state)
+            self.t_function[state] = dict()
+        else:
+            self.states.remove(state)
+            self.states.insert(0, state)
         self.s_state = state
 
 #------------------------------------------------------------------------------
@@ -117,7 +130,6 @@ class NFA():
         """
         if state not in self.states:
             self.states.append(state)
-            # self.state.insert(0, state)
             self.t_function[state] = dict()
 
     def add_function_item(self, state, action, to_state):
@@ -149,7 +161,8 @@ class NFA():
         assert(state in self.states)
         assert(to_state in self.states)
         if action in self.t_function[state]:
-            self.t_function[state][action].append(to_state)
+            if to_state not in self.t_function[state][action]:
+                self.t_function[state][action].append(to_state)
         else:
             self.t_function[state][action] = [to_state]
 
@@ -187,7 +200,6 @@ class NFA():
         # nfa = NFA(new_alphabet, new_states, new_s_state, new_f_states, new_t_functions)
 
         nfa = NFA(new_alphabet, new_states, new_s_state, new_f_states, new_t_functions)
-        nfa.add_state(new_s_state)
         nfa.set_start_state(new_s_state)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state1)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state2)
@@ -248,6 +260,7 @@ class NFA():
     def __str__(self):
         ret = ('------------------NFA desciption------------\n'   +
                 'aphabelt : {}'.format(str(self.alphabet))        + '\n' +
+                'stats : {}'.format(str(self.states))             + '\n' +
                 'start state : {}'.format(str(self.s_state))      + '\n' +
                 'accepted states : {}'.format(str(self.f_states)) + '\n' +
                 'transition fuctions : '                          + '\n')
@@ -255,6 +268,8 @@ class NFA():
             item_str = str((key, str(self.t_function[key])))
             ret += item_str + '\n'
         return ret
+
+
 
 if __name__ == '__main__':
     alphabet = ['a', 'b']
@@ -304,9 +319,13 @@ if __name__ == '__main__':
     print(nfa1 + nfa2)
 
     # test05: test for '|'
-    print('-------(nfa1 + nfa2) | nfa1--------')
-    print((nfa1 + nfa2) | nfa1)
+    print('-------(nfa1 + nfa2) | nfa3--------')
+    new_states = generate_states(2)
+
+    nfa3 = NFA(alphabet, new_states[0:2], new_states[0], [new_states[1]])
+    nfa3.add_function_item(new_states[0], 'a', new_states[1])
+    print((nfa1 + nfa2) | nfa3)
 
     # test06: test for '*'(not implemented)
-    # print('-------nfa | nfa2--------')
+    # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
     # print(((nfa1 + nfa2) | nfa1).repeat())
