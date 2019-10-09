@@ -81,13 +81,25 @@ class NFA():
         return self.f_states
 
     def set_f_states(self, states):
-        """set start state
-        add a new state, 
-        and insert the state in the head of self.states
+        """set final states to be a list
         Returns:
         Raises:
         """
         self.f_states = states
+
+    def add_f_state(self, state):
+        """add a set to the self.f_states
+        if state not in self.states, then state will be added to self.states
+        if state not in self.f_states, then we add state in self.f_states
+        Returns:
+        Raises:
+        """
+        assert(state not in self.f_states)
+        if state not in self.states:
+            self.add_state(state)
+
+        if state not in self.f_states:
+            self.f_states.append(state)
 
     def get_start_state(self):
         return self.s_state
@@ -243,7 +255,18 @@ class NFA():
         Raises:
         """
         # TODO(ShipXu): XiaoHanHou implement this function.
-        pass
+        new_s_state = generate_state()
+        old_s_state = self.get_start_state()
+        new_f_states = self.f_states + [new_s_state]
+        nfa = NFA(self.alphabet, self.states, new_s_state, new_f_states, self.t_function)
+        nfa.add_state(new_s_state)
+        nfa.set_start_state(new_s_state)
+        nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
+
+        for f_state in self.f_states:
+            nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
+
+        return nfa
 
 #------------------------------------------------------------------------------
 # Overloaded operators (regard the repeat as an operator)
@@ -260,7 +283,7 @@ class NFA():
     def __str__(self):
         ret = ('------------------NFA desciption------------\n'   +
                 'aphabelt : {}'.format(str(self.alphabet))        + '\n' +
-                'stats : {}'.format(str(self.states))             + '\n' +
+                'states : {}'.format(str(self.states))             + '\n' +
                 'start state : {}'.format(str(self.s_state))      + '\n' +
                 'accepted states : {}'.format(str(self.f_states)) + '\n' +
                 'transition fuctions : '                          + '\n')
@@ -326,6 +349,6 @@ if __name__ == '__main__':
     nfa3.add_function_item(new_states[0], 'a', new_states[1])
     print((nfa1 + nfa2) | nfa3)
 
-    # test06: test for '*'(not implemented)
-    # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
-    # print(((nfa1 + nfa2) | nfa1).repeat())
+    # test06: test for '*'
+    print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
+    print(((nfa1 + nfa2) | nfa1).repeat())
