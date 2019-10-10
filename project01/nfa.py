@@ -106,8 +106,12 @@ class NFA():
 
     def set_start_state(self, state):
         """set start state
+
         add a new state, 
         and insert the state in the head of self.states
+
+        Args:
+            state : A State object needed to be set as start state
         Returns:
         Raises:
         """
@@ -132,11 +136,15 @@ class NFA():
 
     def add_state(self, state):
         """add state
+
         if state in self.states:
             add a new state to self.states
             and add an empty item (which has no aciton) in the self.t_function
         else:
             ignore it
+
+        Args:
+            state : A State object needed to be added to self.states
         Returns:
         Raises:
         """
@@ -150,9 +158,7 @@ class NFA():
         first we make sure that every state in states has a dict() value in self.t_function,
         by carefully inserting new state using add_state method and using __init__
         to make sure of it.
-
-        so we only need to check if the state and to_state is in the self.states respectively
-
+        so we only need to check if the state and to_state is in the self.states respectively.
 
         Because NFA have multiple states can be acheived by a single action.
         Then if the action is in the self.t_function[state], we simply append the to_state obejct
@@ -188,6 +194,8 @@ class NFA():
         for it is hard to explain in words.
         QAQ
 
+        Args:
+            nfa : other NFA object
         Returns: a new nfa contains the result
         Raises:
         """
@@ -196,22 +204,20 @@ class NFA():
         s_state2 = other_nfa.get_start_state()
 
         # new_alphabet = self.alphabet + other_nfa.get_alphabet()
-        new_alphabet = self.alphabet | other_nfa.get_alphabet() # union operation for set (|)
-        # new_states = self.states + other_nfa.get_states()
-        new_states = self.states + other_nfa.get_states()# + [new_s_state]
+        new_alphabet = self.alphabet | other_nfa.get_alphabet() # union operation for alphabet
+
+        new_states = self.states + other_nfa.get_states()
         new_f_states = self.f_states + other_nfa.get_f_states()
-        # new_t_fuctions = dict(self.t_function, **other_nfa.t_function)
         new_t_functions = union_t_function(self.t_function, other_nfa.t_function)
-        # new_t_functions[new_s_state] = dict()
 
-
-        # new_t_fuctions[new_s_state][EMPTY_STRING] = [s_state1, s_state2]
-        # new_t_functions[new_s_state] = dict()
-        # new_t_functions[new_s_state][EMPTY_STRING] = [s_state1, s_state2]
-
-        # nfa = NFA(new_alphabet, new_states, new_s_state, new_f_states, new_t_functions)
-
+        # build a nfa with new_alphabet, states of both nfas
+        # with s_state as self.s_state
+        # with f_states as other_nfa.get_f_states()
+        # with transition_function as the union of two nfa's t_functions
         nfa = NFA(new_alphabet, new_states, new_s_state, new_f_states, new_t_functions)
+
+        # then new_s_state is added to be the states of new_nfa
+        # set to be new_s_state (all included in nfa.set_start_state method)
         nfa.set_start_state(new_s_state)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state1)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state2)
@@ -224,23 +230,25 @@ class NFA():
         for it is hard to explain in words.
         QAQ
 
+        Args:
+            nfa : other NFA object
         Returns: a new nfa contains the result
         Raises:
         """
         new_alphabet = self.alphabet | other_nfa.get_alphabet() # union operation for set (|)
         new_states = self.states + other_nfa.get_states()
-        # new_t_fuctions = dict(self.t_function, **other_nfa.get_t_function())
-        # new_t_fuctions = dict(self.t_function.items() + other_nfa.get_t_function().items())
         new_t_fuctions = union_t_function(self.t_function, other_nfa.t_function)
 
-        # nfa = NFA(new_alphabet, new_states, self.s_state, other_nfa.get_f_states(), new_t_fuctions)
+        # build a nfa with new_alphabet, states of both nfas
+        # with s_state as self.s_state
+        # with f_states as other_nfa.get_f_states()
+        # with transition_function as the union of two nfa's t_functions
         nfa = NFA(new_alphabet, new_states, self.s_state, other_nfa.get_f_states().copy(), new_t_fuctions)
 
         # we need to add the EMPTY_STRING action to the f_state in self.f_states
         for f_state in self.f_states:
             # we add an item to the self. EMPTY_STRING action, 
             nfa.add_function_item(f_state, EMPTY_STRING, other_nfa.get_start_state())
-            # new_t_fuctions[f_state][EMPTY_STRING] = other_nfa.get_start_state()
 
         return nfa
 
@@ -251,6 +259,8 @@ class NFA():
         for it is hard to explain in words.
         QAQ
 
+        Args:
+            nfa : other NFA object
         Returns: a new nfa contains the result
         Raises:
         """
