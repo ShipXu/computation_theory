@@ -188,7 +188,7 @@ class NFA():
 # Provide methods as the adhesive of nfas
 #------------------------------------------------------------------------------
     def or_nfa(self, other_nfa):
-        """ provide an or mehotd for oring two nfas
+        """ provides a method for oring two nfas
 
         plz refered to the P68 in the <<Introduction of Theory of Computation>>,
         for it is hard to explain in words.
@@ -265,17 +265,25 @@ class NFA():
         Raises:
         """
         # TODO(ShipXu): XiaoHanHou implement this function.
+        # new_s_state = generate_state()
+        # old_s_state = self.get_start_state()
+        # new_f_states = self.f_states + [new_s_state]
+        # nfa = NFA(self.alphabet, self.states, new_s_state, new_f_states, self.t_function)
+        # nfa.add_state(new_s_state)
+        # nfa.set_start_state(new_s_state)
+        # nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
+
+        # for f_state in self.f_states:
+        #     nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
+
         new_s_state = generate_state()
         old_s_state = self.get_start_state()
-        new_f_states = self.f_states + [new_s_state]
-        nfa = NFA(self.alphabet, self.states, new_s_state, new_f_states, self.t_function)
-        nfa.add_state(new_s_state)
+        nfa = NFA(self.alphabet, self.states, new_s_state, self.f_states, self.t_function)
         nfa.set_start_state(new_s_state)
-        nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
+        nfa.add_f_state(new_s_state)
 
         for f_state in self.f_states:
             nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
-
         return nfa
 
 #------------------------------------------------------------------------------
@@ -360,5 +368,6 @@ if __name__ == '__main__':
     print((nfa1 + nfa2) | nfa3)
 
     # test06: test for '*'
-    print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
-    print(((nfa1 + nfa2) | nfa1).repeat())
+    # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
+    # print(((nfa1 + nfa2) | nfa1).repeat())
+    print(nfa1.repeat())
