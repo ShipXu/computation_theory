@@ -5,6 +5,24 @@ from nfa import generate_state
 
 EMPTY_STRING = ''
 
+def _add_nfa(nfa, other_nfa):
+    """ generate the nfa that recognizes the action string
+
+    if nfa is None, return the other nfa
+    if not, return nfa
+
+    Args:
+        nfa : A NFA object
+        other_nfa : Another NFA object
+    Returns:
+        
+    Raises:
+    """
+    if nfa is None:
+        return other_nfa
+    else:
+        return nfa + other_nfa
+
 def generate_head_nfa(alphabet):
     """ generate a head nfa(->[s0])
 
@@ -26,7 +44,9 @@ def generate_aciton_nfa(action, alphabet):
     """ generate the nfa that recognizes the action string
 
     Args:
+        action : means the string needed for transition
         aplhabet : alphabet of the constucting nfa
+
     Returns:
         nfa : A NFA object recognizes the action string
     Raises:
@@ -71,12 +91,22 @@ def read_repeat(s, alphabet, nfa):
 def read_parentheses(s, nfa):
     # TODO(ShipXu): This fuction reserved for XiaoHanHou.
     # Your code here
-    pass
+    # p_nfa 
+    index_rp = 0
+    p_s = ''
+
+    while s[index_rp] != ')':
+        p_s += s[index_rp]
+        index_rp = index_rp + 1
+    print(index_rp)
+    print(p_s)
+    p_nfa = _trans_RE_to_NFA(p_s, alphabet)
+    return index_rp, p_nfa
 
 def read_add(action, alphabet, nfa=None):
     """ deal with the add situation
 
-    generate nfa that recogize the action string
+    generate nfa that recognize the action string
     if nfa is None(haven't recogized string before): return action_nfa
     if not : return nfa + action_nfa
 
@@ -90,15 +120,12 @@ def read_add(action, alphabet, nfa=None):
     Raises:
     """
     action_nfa = generate_aciton_nfa(action, alphabet)
-    if nfa is None:
-        return action_nfa
-    else:
-        return nfa + action_nfa
+    return _add_nfa(nfa, action_nfa)
 
 def read_token(s, alphabet, nfa=None):
     """recursively deal with the regular expresssion string
 
-    we can classsify the questions as four type:
+    we can classify the questions as four type:
     * : read_repeat,
     | : read_or,
     ( : read_parentheses
@@ -108,7 +135,7 @@ def read_token(s, alphabet, nfa=None):
 
     Args:
         alphabet : alphabet of the constucting nfa
-        nfa : the nfa that recoginize the previous
+        nfa : the nfa that recognize the previous
             regular expresssion string
     Returns:
     Raises:
@@ -121,7 +148,16 @@ def read_token(s, alphabet, nfa=None):
     elif s[0] == '|':
         return read_or(s[1:], alphabet, nfa)
     elif s[0] == '(':
-        return read_parentheses(s[1:], nfa)
+        index_rp, p_nfa = read_parentheses(s[1:], nfa)
+        # consider the left parentheses
+        index_rp += 1
+        if len(s) >= index_rp + 2 and s[index_rp + 1] == '*':
+            p_nfa.repeat()
+            # start read from two word after the position of right parentheses
+            return read_token(s[index_rp + 2:], alphabet, _add_nfa(nfa, p_nfa))
+        elif len(s) >= index_rp + 1:
+            # start read from one word after the position of right parentheses
+            return read_token(s[index_rp + 1:], alphabet, _add_nfa(nfa, p_nfa))
     else:
         return read_token(s[1:], alphabet, read_add(s[0], alphabet, nfa))
 
@@ -149,10 +185,10 @@ def trans_RE_to_NFA(re):
 if __name__ == '__main__':
     # alphabet = ['a', 'b']
 
-    regualar_string = 'a|b|c'
+    regualar_string = '(a|b)a'
     alphabet = list(set([word for word in regualar_string
                          if word.isalpha() or word.isdigit()]))
     re = RE(alphabet, regualar_string)
-    # re = RE(alphabet, 'a*')
+
     nfa = trans_RE_to_NFA(re)
     print(nfa)
