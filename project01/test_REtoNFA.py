@@ -98,8 +98,7 @@ def read_parentheses(s, nfa):
     while s[index_rp] != ')':
         p_s += s[index_rp]
         index_rp = index_rp + 1
-    print(index_rp)
-    print(p_s)
+
     p_nfa = _trans_RE_to_NFA(p_s, alphabet)
     return index_rp, p_nfa
 
@@ -152,9 +151,9 @@ def read_token(s, alphabet, nfa=None):
         # consider the left parentheses
         index_rp += 1
         if len(s) >= index_rp + 2 and s[index_rp + 1] == '*':
-            p_nfa.repeat()
+            # p_nfa.repeat()
             # start read from two word after the position of right parentheses
-            return read_token(s[index_rp + 2:], alphabet, _add_nfa(nfa, p_nfa))
+            return read_token(s[index_rp + 2:], alphabet, _add_nfa(nfa, p_nfa.repeat()))
         elif len(s) >= index_rp + 1:
             # start read from one word after the position of right parentheses
             return read_token(s[index_rp + 1:], alphabet, _add_nfa(nfa, p_nfa))
@@ -182,13 +181,38 @@ def trans_RE_to_NFA(re):
     """
     return _trans_RE_to_NFA(re.s, re.alphabet)
 
+def add_parathese_repeat(s):
+    return _add_parathese_repeat(s, 0)
+
+def _add_parathese_repeat(s, index):
+    if not s:
+        return s
+
+    new_r_index = s.find('*', index)
+
+    # not found
+    if new_r_index == -1:
+        return s
+
+    if new_r_index >= 2 and s[new_r_index - 1] != ')':
+        return (s[0 : new_r_index - 1] + '('
+                                     + s[new_r_index - 1] + ')*'
+                                     + add_parathese_repeat(s[new_r_index + 1:]))
+
+    if new_r_index >= 1 and s[new_r_index - 1] != ')':
+        return ('(' + s[0 : new_r_index] + ')*'
+                    + add_parathese_repeat(s[new_r_index + 1:]))
+
 if __name__ == '__main__':
     # alphabet = ['a', 'b']
 
-    regualar_string = '(a|b)a'
-    alphabet = list(set([word for word in regualar_string
+    # regualar_string = '(b)* | a'
+    regular_string = 'aaaa | b*'
+    print('before add parethese : {}'.format(regular_string))
+    print('after adding parethese : {}'.format(add_parathese_repeat(regular_string)))
+    alphabet = list(set([word for word in regular_string
                          if word.isalpha() or word.isdigit()]))
-    re = RE(alphabet, regualar_string)
+    re = RE(alphabet, add_parathese_repeat(regular_string))
 
     nfa = trans_RE_to_NFA(re)
     print(nfa)

@@ -284,6 +284,8 @@ class NFA():
 
         for f_state in self.f_states:
             nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
+
+
         return nfa
 
 #------------------------------------------------------------------------------
@@ -370,4 +372,4 @@ if __name__ == '__main__':
     # test06: test for '*'
     # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
     # print(((nfa1 + nfa2) | nfa1).repeat())
-    print(nfa1.repeat())
+    print(nfa2.repeat())
