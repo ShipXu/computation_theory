@@ -37,9 +37,7 @@ def union_t_function(t_function1, t_function2):
     return t_function
 
 class NFA():
-    """Summary of class here.
-
-    Defination of the regular language.
+    """Definition of the Nondeterministic Finite Automaton.
 
     Attributes:
         alphabet:   list object to store finate alphabet
@@ -311,8 +309,6 @@ class NFA():
             item_str = str((key, str(self.t_function[key])))
             ret += item_str + '\n'
         return ret
-
-
 
 if __name__ == '__main__':
     alphabet = ['a', 'b']

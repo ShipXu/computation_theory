@@ -204,9 +204,6 @@ def _add_parathese_repeat(s, index):
                     + add_parathese_repeat(s[new_r_index + 1:]))
 
 if __name__ == '__main__':
-    # alphabet = ['a', 'b']
-
-    # regualar_string = '(b)* | a'
     regular_string = 'aaaa | b*'
     print('before add parethese : {}'.format(regular_string))
     print('after adding parethese : {}'.format(add_parathese_repeat(regular_string)))
