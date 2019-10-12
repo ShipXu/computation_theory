@@ -28,12 +28,15 @@ class State():
         return str(self)
 
 def union_t_function(t_function1, t_function2):
-    t_function = t_function1.copy()
+    t_function = {}
+    for key in t_function1.keys():
+        t_function[key] = t_function1[key].copy()
+
     for key in t_function2.keys():
         if key not in t_function:
-            t_function[key] = t_function2[key]
+            t_function[key] = t_function2[key].copy()
         else:
-            t_function[key] += t_function2[key]
+            t_function[key] += t_function2[key].copy()
     return t_function
 
 class NFA():
@@ -113,12 +116,12 @@ class NFA():
         Returns:
         Raises:
         """
-        if state not in self.states:
-            self.states.insert(0, state)
-            self.t_function[state] = dict()
-        else:
-            self.states.remove(state)
-            self.states.insert(0, state)
+        # if state not in self.states:
+        #     self.states.insert(0, state)
+        #     self.t_function[state] = dict()
+        # else:
+        #     self.states.remove(state)
+        #     self.states.insert(0, state)
         self.s_state = state
 
 #------------------------------------------------------------------------------
@@ -216,7 +219,7 @@ class NFA():
 
         # then new_s_state is added to be the states of new_nfa
         # set to be new_s_state (all included in nfa.set_start_state method)
-        nfa.set_start_state(new_s_state)
+        nfa.add_state(new_s_state)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state1)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state2)
         return nfa
@@ -263,26 +266,16 @@ class NFA():
         Raises:
         """
         # TODO(ShipXu): XiaoHanHou implement this function.
-        # new_s_state = generate_state()
-        # old_s_state = self.get_start_state()
-        # new_f_states = self.f_states + [new_s_state]
-        # nfa = NFA(self.alphabet, self.states, new_s_state, new_f_states, self.t_function)
-        # nfa.add_state(new_s_state)
-        # nfa.set_start_state(new_s_state)
-        # nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
-
-        # for f_state in self.f_states:
-        #     nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
-
         new_s_state = generate_state()
         old_s_state = self.get_start_state()
-        nfa = NFA(self.alphabet, self.states, new_s_state, self.f_states, self.t_function)
+        new_f_states = self.f_states.copy()
+        nfa = NFA(self.alphabet, self.states.copy(), new_s_state, new_f_states, self.t_function)
+        nfa.add_state(new_s_state)
         nfa.set_start_state(new_s_state)
-        nfa.add_f_state(new_s_state)
+        nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
 
         for f_state in self.f_states:
             nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
-
 
         return nfa
 
@@ -310,22 +303,48 @@ class NFA():
             ret += item_str + '\n'
         return ret
 
+#------------------------------------------------------------------------------
+# Recogize if string is legal
+#------------------------------------------------------------------------------
+    def _run(self, s, present_node):
+        if not s:
+            if present_node in self.f_states:
+                return True
+            else:
+                return False
+
+        if EMPTY_STRING in self.t_function[present_node]:
+            for to_node in self.t_function[present_node][EMPTY_STRING]:
+                if self._run(s, to_node):
+                    return True
+
+        if s[0] in self.t_function[present_node]:
+            for to_node in self.t_function[present_node][s[0]]:
+                if self._run(s[1:], to_node):
+                    return True
+
+        return False
+
+    def run(self, s):
+        return self._run(s, self.s_state)
+
 if __name__ == '__main__':
     alphabet = ['a', 'b']
 
     # test01: generate_state
+    print('test01: generate_state')
     s1 = generate_state()
     s2 = generate_state()
     s3 = generate_state()
     print(s1, s2, s3)
 
     # test02: nfa
+    print('test02: generate nfa')
     states = [s1, s2]
     s_state = s1
     f_states = [s1, s2]
     nfa = NFA(alphabet, states, s_state, f_states)
     nfa.add_function_item(s1, 'a', s2)
-    nfa.add_function_item(s2, 'a', s2)
     print(nfa)
 
     # generate states variable
@@ -335,6 +354,7 @@ if __name__ == '__main__':
     print(states)
 
     # test03: nfa a ; nfa b
+    print('test03: nfa a ; nfa b')
     nfa1 = NFA(alphabet, states[0:2], states[0], [states[1]])
     nfa1.add_function_item(states[0], 'a', states[1])
     print('-------nfa1--------')
@@ -344,7 +364,14 @@ if __name__ == '__main__':
     print('-------nfa2--------')
     print(nfa2)
 
+    new_states = generate_states(2)
+    nfa3 = NFA(alphabet, new_states[0:2], new_states[0], [new_states[1]])
+    nfa3.add_function_item(new_states[0], 'a', new_states[1])
+    print('-------nfa3--------')
+    print(nfa3)
+
     # test04: test for t_function_union
+    print('test04: for t_function_union')
     t_function1 = nfa1.get_t_function()
     t_function2 = nfa2.get_t_function()
 
@@ -354,18 +381,27 @@ if __name__ == '__main__':
     print(union_t_function(t_function1, t_function2))
 
     # test05: test for '+'
+    print('test05: test for +')
     print('-------nfa1 + nfa2--------')
     print(nfa1 + nfa2)
 
     # test05: test for '|'
+    print('test05: test for |')
     print('-------(nfa1 + nfa2) | nfa3--------')
-    new_states = generate_states(2)
-
-    nfa3 = NFA(alphabet, new_states[0:2], new_states[0], [new_states[1]])
-    nfa3.add_function_item(new_states[0], 'a', new_states[1])
     print((nfa1 + nfa2) | nfa3)
 
     # test06: test for '*'
-    # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
-    # print(((nfa1 + nfa2) | nfa1).repeat())
-    print(nfa2.repeat())
+    print('test06: test for *')
+    print('-------((nfa1 + nfa2) | nfa3).repeat()--------')
+    print(((nfa1 + nfa2) | nfa3).repeat())
+    nfa4 = ((nfa1 + nfa2) | nfa3).repeat()
+
+    
+    print('-------nfa3--------')
+    print(nfa3)
+    print(nfa3.repeat())
+
+    nfa4 = nfa3.repeat()
+
+    print(nfa4)
+    print(nfa4.run('abaabbb'))
