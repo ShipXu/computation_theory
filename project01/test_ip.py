@@ -17,7 +17,7 @@ def ip_match(input_string):
 
     Raises:
     """
-    pattern_string = '([0-2]?[0-9]?[0-9]\.){3}([0-2]?[0-9]?[0-9])'
+    pattern_string ='(([1-9])\.|([1-9][0-9])\.|(1\d\d)\.|(2[0-4]\d)\.|(25[0-5])\.)(([1-9]?\d)\.|(1\d\d)\.|(2[0-4]\d)\.|(25[0-5])\.){2}(([1-9]?\d)|(1\d\d)|(2[0-4]\d)|(25[0-5]))$'
     match_ret = re.match(pattern_string, input_string)
     return match_ret is not None
 
