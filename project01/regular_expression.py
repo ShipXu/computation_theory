@@ -4,11 +4,16 @@ class RE():
     """Defination of the regular language.
 
     Attributes:
+<<<<<<< Updated upstream
         s: the string to describe the regular language 
 
+=======
+        s: the string that describes the regular language
+        alphabet: list object to store finite alphabet
+>>>>>>> Stashed changes
     """
     def __init__(self, alphabet, s):
-        # TODO check is word in s is in the alphabeta
+        # TODO check is word in s is in the alphabet
         self.alphabet = alphabet
         self.s = s
 
@@ -40,32 +45,32 @@ class RE():
         return self.s
 
 # a function object that can used to produce a re object
-# when alphabelt is given 
-EMPTY_RE = (lambda alphabelt: RE(alphabelt, EMPTY_STRING))
+# when alphabet is given
+EMPTY_RE = (lambda alphabet: RE(alphabet, EMPTY_STRING))
 
-def get_alphabelt_re(alphabelt):
-    ret = EMPTY_RE(alphabelt)
+def get_alphabelt_re(alphabet):
+    ret = EMPTY_RE(alphabet)
 
-    if alphabelt:
-        ret = RE(alphabelt, alphabelt[0])
-        for a in alphabelt[1:]:
-            ret |= RE(alphabelt, a)
+    if alphabet:
+        ret = RE(alphabet, alphabet[0])
+        for a in alphabet[1:]:
+            ret |= RE(alphabet, a)
     return ret()
 
 if __name__ == '__main__':
-    alphabelt = ['0', '1']
+    alphabet = ['0', '1']
 
-    re_01 = (lambda s: RE(alphabelt, s))
+    re_01 = (lambda s: RE(alphabet, s))
     print(re_01('0').repeat())
 
-    # test pratices in P65 of book
+    # test practices in P65 of book
     # test01: 0*10*
-    # print(RE(alphabelt, '0'))
+    # print(RE(alphabet, '0'))
     print(re_01('0').repeat() + re_01('1') + re_01('0').repeat())
 
-    # test02: (alphabelt)*1(alphabelt)*
-    re_alphabeta = get_alphabelt_re(alphabelt)
-    print(re_alphabeta.repeat() + re_01('1') + re_alphabeta.repeat())
+    # test02: (alphabet)*1(alphabet)*
+    re_alphabet = get_alphabelt_re(alphabet)
+    print(re_alphabet.repeat() + re_01('1') + re_alphabet.repeat())
 
     # test03: 01 | 10
     print(re_01('01') | re_01('10'))

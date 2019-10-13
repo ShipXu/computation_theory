@@ -42,11 +42,11 @@ class NFA():
     Defination of the regular language.
 
     Attributes:
-        alphabet:   list object to store finate alphabet
+        alphabet:   list object to store finite alphabet
         states:     list object to store the states
         s_state:    State object (cannot be None)
         f_states:   list object to store the accepted states
-        t_function: a nesting dict obejct, whose value is also a dict object
+        t_function: a nesting dict object, whose value is also a dict object
                     that store the states corresponded to the action on the edge
     """
     def __init__(self, alphabet, states, s_state, f_states=[], t_function=None):
@@ -224,11 +224,7 @@ class NFA():
         return nfa
 
     def add_nfa(self, other_nfa):
-        """ provide an or mehotd for oring two nfas
-
-        plz refered to the P68 in the <<Introduction of Theory of Computation>>,
-        for it is hard to explain in words.
-        QAQ
+        """ provide an or method for oring two nfas
 
         Args:
             nfa : other NFA object
@@ -302,16 +298,57 @@ class NFA():
 
     def __str__(self):
         ret = ('------------------NFA desciption------------\n'   +
-                'aphabelt : {}'.format(str(self.alphabet))        + '\n' +
+                'alphabet : {}'.format(str(self.alphabet))        + '\n' +
                 'states : {}'.format(str(self.states))             + '\n' +
                 'start state : {}'.format(str(self.s_state))      + '\n' +
                 'accepted states : {}'.format(str(self.f_states)) + '\n' +
-                'transition fuctions : '                          + '\n')
+                'transition functions : '                          + '\n')
         for key in self.t_function.keys():
             item_str = str((key, str(self.t_function[key])))
             ret += item_str + '\n'
         return ret
 
+<<<<<<< Updated upstream
+=======
+#------------------------------------------------------------------------------
+# Recogize if string is legal
+#------------------------------------------------------------------------------
+    def _run(self, s, present_node):
+        """ provide a method for using nfa to recognize string，
+        
+        The method provides a bfs-like method for recognizing string s,
+        if s is empty and present_node is in the self.f_states:
+            we can conclude that string is recognizable.
+        if not:
+            first we deals with the EMPTY STRING situation, the functions will
+            pass s directly to the next search；
+            secondly, we can check if s[0] is the item of present_node's transition
+            function in the nfa, and we pass s[1:] (s[0] is used) to the next search;
+
+        Args:
+            s : string that is needed to be judged
+            present_node : the current state of current search turn
+        Returns:
+            if nfa recognized a string, return True
+            if string is illegal to this nfa, return False
+        """
+
+        if not s:
+            if present_node in self.f_states:
+                return True
+            else:
+                return False
+
+        if EMPTY_STRING in self.t_function[present_node]:
+            for to_node in self.t_function[present_node][EMPTY_STRING]:
+                if self._run(s, to_node):
+                    return True
+
+        if s[0] in self.t_function[present_node]:
+            for to_node in self.t_function[present_node][s[0]]:
+                if self._run(s[1:], to_node):
+                    return True
+>>>>>>> Stashed changes
 
 
 if __name__ == '__main__':
