@@ -307,6 +307,25 @@ class NFA():
 # Recogize if string is legal
 #------------------------------------------------------------------------------
     def _run(self, s, present_node):
+        """ provide a method for using nfa to recognize string，
+        
+        The method provides a bfs-like method for recognizing string s,
+        if s is empty and present_node is in the self.f_states:
+            we can conclude that string is recognizable.
+        if not:
+            first we deals with the EMPTY STRING situation, the functions will
+            pass s directly to the next search；
+            secondly, we can check if s[0] is the item of present_node's transition
+            fuction in the nfa, and we pass s[1:] (s[0] is used) to the next search;
+
+        Args:
+            s : string that is needed to be judged
+            present_node : the current state of current search turn
+        Returns:
+            if nfa recognized a string, return True
+            if string is illegal to this nfa, return False
+        """
+
         if not s:
             if present_node in self.f_states:
                 return True
@@ -326,6 +345,17 @@ class NFA():
         return False
 
     def run(self, s):
+        """ provide a method for using nfa to recognize string，
+        
+        nfa will determine if the string is belong to the grammar of nfa.
+
+        Args:
+            s : string that is needed to be judged
+        Returns:
+            if nfa recognized a string, return True
+            if string is illegal to this nfa, return False
+        Raises:
+        """
         return self._run(s, self.s_state)
 
 if __name__ == '__main__':

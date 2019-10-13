@@ -202,14 +202,23 @@ def _add_parathese_repeat(s, index):
     if new_r_index >= 1 and s[new_r_index - 1] != ')':
         return ('(' + s[0 : new_r_index] + ')*'
                     + add_parathese_repeat(s[new_r_index + 1:]))
+    
+    return s
 
 if __name__ == '__main__':
-    regular_string = 'aaaa | b*'
-    print('before add parethese : {}'.format(regular_string))
-    print('after adding parethese : {}'.format(add_parathese_repeat(regular_string)))
-    alphabet = list(set([word for word in regular_string
-                         if word.isalpha() or word.isdigit()]))
-    re = RE(alphabet, add_parathese_repeat(regular_string))
+    with open('test_retonfa.txt') as f:
+        count = 1
+        for line in f.readlines():
+            regular_string = line.replace('\n', '')
+            print('test {}'.format(str(count)))
+            print('before add parethese : {}'.format(regular_string))
+            print('after adding parethese : {}'.format(add_parathese_repeat(regular_string)))
 
-    nfa = trans_RE_to_NFA(re)
-    print(nfa)
+            alphabet = list(set([word for word in regular_string
+                                if word.isalpha() or word.isdigit()]))
+            re = RE(alphabet, add_parathese_repeat(regular_string))
+
+            nfa = trans_RE_to_NFA(re)
+            print('the nfa of {}'.format(add_parathese_repeat(regular_string)))
+            print(nfa)
+            count += 1
