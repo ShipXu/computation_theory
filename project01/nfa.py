@@ -9,6 +9,18 @@ def generate_states(num_states):
         ret_states.append(generate_state())
     return ret_states
 
+def union_t_function(t_function1, t_function2):
+    t_function = {}
+    for key in t_function1.keys():
+        t_function[key] = t_function1[key].copy()
+
+    for key in t_function2.keys():
+        if key not in t_function:
+            t_function[key] = t_function2[key].copy()
+        else:
+            t_function[key] += t_function2[key].copy()
+    return t_function
+
 class State():
     id = 0
 
@@ -26,18 +38,6 @@ class State():
     def __repr__(self):
         # repr : used when transforming ab object to string
         return str(self)
-
-def union_t_function(t_function1, t_function2):
-    t_function = {}
-    for key in t_function1.keys():
-        t_function[key] = t_function1[key].copy()
-
-    for key in t_function2.keys():
-        if key not in t_function:
-            t_function[key] = t_function2[key].copy()
-        else:
-            t_function[key] += t_function2[key].copy()
-    return t_function
 
 class NFA():
     """Definition of the Nondeterministic Finite Automaton.
