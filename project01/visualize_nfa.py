@@ -12,6 +12,7 @@ if __name__ == '__main__':
 
     graph = Digraph()
 
+
     s_node = nfa.get_start_state()
     graph.node('%s'%s_node, shape="doublecircle")
 
@@ -28,10 +29,8 @@ if __name__ == '__main__':
                 if action == EMPTY_STRING:
                     graph.edge('%s'%node, '%s'%to_node, '%s'%'EMPTY_STRING')
                 else:
-                    graph.edge('%s'%node, '%s'%to_node, '%s'%graph)
+                    graph.edge('%s'%node, '%s'%to_node, '%s'%action)
     
     _s_node = ''
-    graph.node(_s_node, shape="circle", color='white')
-    graph.edge(_s_node, '%s'%nfa.get_start_state())
-    graph.format = 'png'
-    graph.render('output-graph.gv', view=True)
+    graph.graph_attr['rankdir'] = 'LR'
+    graph.view()
