@@ -28,25 +28,26 @@ class State():
         return str(self)
 
 def union_t_function(t_function1, t_function2):
-    t_function = t_function1.copy()
+    t_function = {}
+    for key in t_function1.keys():
+        t_function[key] = t_function1[key].copy()
+
     for key in t_function2.keys():
         if key not in t_function:
-            t_function[key] = t_function2[key]
+            t_function[key] = t_function2[key].copy()
         else:
-            t_function[key] += t_function2[key]
+            t_function[key] += t_function2[key].copy()
     return t_function
 
 class NFA():
-    """Summary of class here.
-
-    Defination of the regular language.
+    """Definition of the Nondeterministic Finite Automaton.
 
     Attributes:
-        alphabet:   list object to store finite alphabet
+        alphabet:   list object to store finate alphabet
         states:     list object to store the states
         s_state:    State object (cannot be None)
         f_states:   list object to store the accepted states
-        t_function: a nesting dict object, whose value is also a dict object
+        t_function: a nesting dict obejct, whose value is also a dict object
                     that store the states corresponded to the action on the edge
     """
     def __init__(self, alphabet, states, s_state, f_states=[], t_function=None):
@@ -115,12 +116,12 @@ class NFA():
         Returns:
         Raises:
         """
-        if state not in self.states:
-            self.states.insert(0, state)
-            self.t_function[state] = dict()
-        else:
-            self.states.remove(state)
-            self.states.insert(0, state)
+        # if state not in self.states:
+        #     self.states.insert(0, state)
+        #     self.t_function[state] = dict()
+        # else:
+        #     self.states.remove(state)
+        #     self.states.insert(0, state)
         self.s_state = state
 
 #------------------------------------------------------------------------------
@@ -218,13 +219,17 @@ class NFA():
 
         # then new_s_state is added to be the states of new_nfa
         # set to be new_s_state (all included in nfa.set_start_state method)
-        nfa.set_start_state(new_s_state)
+        nfa.add_state(new_s_state)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state1)
         nfa.add_function_item(new_s_state, EMPTY_STRING, s_state2)
         return nfa
 
     def add_nfa(self, other_nfa):
-        """ provide an or method for oring two nfas
+        """ provide an or mehotd for oring two nfas
+
+        plz refered to the P68 in the <<Introduction of Theory of Computation>>,
+        for it is hard to explain in words.
+        QAQ
 
         Args:
             nfa : other NFA object
@@ -261,26 +266,16 @@ class NFA():
         Raises:
         """
         # TODO(ShipXu): XiaoHanHou implement this function.
-        # new_s_state = generate_state()
-        # old_s_state = self.get_start_state()
-        # new_f_states = self.f_states + [new_s_state]
-        # nfa = NFA(self.alphabet, self.states, new_s_state, new_f_states, self.t_function)
-        # nfa.add_state(new_s_state)
-        # nfa.set_start_state(new_s_state)
-        # nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
-
-        # for f_state in self.f_states:
-        #     nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
-
         new_s_state = generate_state()
         old_s_state = self.get_start_state()
-        nfa = NFA(self.alphabet, self.states, new_s_state, self.f_states, self.t_function)
+        new_f_states = self.f_states.copy() + [new_s_state]
+        nfa = NFA(self.alphabet, self.states.copy(), new_s_state, new_f_states, self.t_function)
+        nfa.add_state(new_s_state)
         nfa.set_start_state(new_s_state)
-        nfa.add_f_state(new_s_state)
+        nfa.add_function_item(new_s_state, EMPTY_STRING, old_s_state)
 
         for f_state in self.f_states:
             nfa.add_function_item(f_state, EMPTY_STRING, old_s_state)
-
 
         return nfa
 
@@ -298,21 +293,33 @@ class NFA():
 
     def __str__(self):
         ret = ('------------------NFA desciption------------\n'   +
-                'alphabet : {}'.format(str(self.alphabet))        + '\n' +
+                'aphabelt : {}'.format(str(self.alphabet))        + '\n' +
                 'states : {}'.format(str(self.states))             + '\n' +
                 'start state : {}'.format(str(self.s_state))      + '\n' +
                 'accepted states : {}'.format(str(self.f_states)) + '\n' +
-                'transition functions : '                          + '\n')
+                'transition fuctions : '                          + '\n')
         for key in self.t_function.keys():
             item_str = str((key, str(self.t_function[key])))
             ret += item_str + '\n'
         return ret
 
-<<<<<<< Updated upstream
-=======
 #------------------------------------------------------------------------------
 # Recogize if string is legal
 #------------------------------------------------------------------------------
+    def run(self, s):
+        """ provide a method for using nfa to recognize string，
+        
+        nfa will determine if the string is belong to the grammar of nfa.
+
+        Args:
+            s : string that is needed to be judged
+        Returns:
+            if nfa recognized a string, return True
+            if string is illegal to this nfa, return False
+        Raises:
+        """
+        return self._run(s, self.s_state)
+
     def _run(self, s, present_node):
         """ provide a method for using nfa to recognize string，
         
@@ -348,25 +355,26 @@ class NFA():
             for to_node in self.t_function[present_node][s[0]]:
                 if self._run(s[1:], to_node):
                     return True
->>>>>>> Stashed changes
 
+        return False
 
 if __name__ == '__main__':
     alphabet = ['a', 'b']
 
     # test01: generate_state
+    print('test01: generate_state')
     s1 = generate_state()
     s2 = generate_state()
     s3 = generate_state()
     print(s1, s2, s3)
 
     # test02: nfa
+    print('test02: generate nfa')
     states = [s1, s2]
     s_state = s1
     f_states = [s1, s2]
     nfa = NFA(alphabet, states, s_state, f_states)
     nfa.add_function_item(s1, 'a', s2)
-    nfa.add_function_item(s2, 'a', s2)
     print(nfa)
 
     # generate states variable
@@ -376,6 +384,7 @@ if __name__ == '__main__':
     print(states)
 
     # test03: nfa a ; nfa b
+    print('test03: nfa a ; nfa b')
     nfa1 = NFA(alphabet, states[0:2], states[0], [states[1]])
     nfa1.add_function_item(states[0], 'a', states[1])
     print('-------nfa1--------')
@@ -385,7 +394,14 @@ if __name__ == '__main__':
     print('-------nfa2--------')
     print(nfa2)
 
+    new_states = generate_states(2)
+    nfa3 = NFA(alphabet, new_states[0:2], new_states[0], [new_states[1]])
+    nfa3.add_function_item(new_states[0], 'a', new_states[1])
+    print('-------nfa3--------')
+    print(nfa3)
+
     # test04: test for t_function_union
+    print('test04: for t_function_union')
     t_function1 = nfa1.get_t_function()
     t_function2 = nfa2.get_t_function()
 
@@ -395,18 +411,17 @@ if __name__ == '__main__':
     print(union_t_function(t_function1, t_function2))
 
     # test05: test for '+'
+    print('test05: test for +')
     print('-------nfa1 + nfa2--------')
     print(nfa1 + nfa2)
 
     # test05: test for '|'
+    print('test05: test for |')
     print('-------(nfa1 + nfa2) | nfa3--------')
-    new_states = generate_states(2)
-
-    nfa3 = NFA(alphabet, new_states[0:2], new_states[0], [new_states[1]])
-    nfa3.add_function_item(new_states[0], 'a', new_states[1])
     print((nfa1 + nfa2) | nfa3)
 
     # test06: test for '*'
-    # print('-------((nfa1 + nfa2) | nfa1).repeat()--------')
-    # print(((nfa1 + nfa2) | nfa1).repeat())
-    print(nfa2.repeat())
+    print('test06: test for *')
+    print('-------((nfa1 + nfa2) | nfa3).repeat()--------')
+    print(((nfa1 + nfa2) | nfa3).repeat())
+    nfa4 = ((nfa1 + nfa2) | nfa3).repeat()

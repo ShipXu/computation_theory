@@ -1,16 +1,11 @@
 EMPTY_STRING = ''
 
 class RE():
-    """Defination of the regular language.
+    """Definition of the regular language.
 
     Attributes:
-<<<<<<< Updated upstream
-        s: the string to describe the regular language 
-
-=======
         s: the string that describes the regular language
         alphabet: list object to store finite alphabet
->>>>>>> Stashed changes
     """
     def __init__(self, alphabet, s):
         # TODO check is word in s is in the alphabet

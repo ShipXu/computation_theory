@@ -2,7 +2,6 @@
 from regular_expression import RE
 from nfa import NFA, State
 from nfa import generate_state
-from graphviz import Digraph
 
 EMPTY_STRING = ''
 
@@ -31,7 +30,7 @@ def generate_head_nfa(alphabet):
     which is also the the start state and this nfa doesn't have final state
 
     Args:
-        alphabet : alphabet of the constructing nfa
+        aplhabet : alphabet of the constucting nfa
     Returns:
         nfa : A NFA object that only has an initial state,
               which is also the the start state and this nfa doesn't have final state
@@ -46,7 +45,7 @@ def generate_aciton_nfa(action, alphabet):
 
     Args:
         action : means the string needed for transition
-        alphabet : alphabet of the constructing nfa
+        aplhabet : alphabet of the constucting nfa
 
     Returns:
         nfa : A NFA object recognizes the action string
@@ -73,11 +72,11 @@ def read_or(s, alphabet, nfa1):
     use or operator to combine these two nfas
 
     Args:
-        alphabet : alphabet of the constructing nfa
-        nfa1 : the nfa that recognize the previous
-               regular expression string
+        aplhabet : alphabet of the constucting nfa
+        nfa1 : the nfa that recoginize the previous
+               regular expresssion string
     Returns:
-        if nfa is None(haven't recognized string before): return action_nfa
+        if nfa is None(haven't recogized string before): return action_nfa
         if not : return nfa + action_nfa
     Raises:
     """
@@ -89,7 +88,7 @@ def read_repeat(s, alphabet, nfa):
     # Your code here
     pass
 
-def read_parentheses(s, nfa, alphabet):
+def read_parentheses(s, alphabet, nfa):
     # TODO(ShipXu): This fuction reserved for XiaoHanHou.
     # Your code here
     # p_nfa 
@@ -107,15 +106,15 @@ def read_add(action, alphabet, nfa=None):
     """ deal with the add situation
 
     generate nfa that recognize the action string
-    if nfa is None(haven't recognized string before): return action_nfa
+    if nfa is None(haven't recogized string before): return action_nfa
     if not : return nfa + action_nfa
 
     Args:
-        alphabet : alphabet of the constructing nfa
-        nfa : the nfa that recognize the previous
-              regular expression string
+        alphabet : alphabet of the constucting nfa
+        nfa : the nfa that recoginize the previous
+              regular expresssion string
     Returns:
-        if nfa is None(haven't recognized string before): return action_nfa
+        if nfa is None(haven't recogized string before): return action_nfa
         if not : return nfa + action_nfa
     Raises:
     """
@@ -143,12 +142,13 @@ def read_token(s, alphabet, nfa=None):
     if not s:
         return nfa
 
-    if s[0] == '*':
-        return read_repeat(s[1:], alphabet, nfa)
-    elif s[0] == '|':
+    # if s[0] == '*':
+    #     return read_repeat(s[1:], alphabet, nfa)
+    # el
+    if s[0] == '|':
         return read_or(s[1:], alphabet, nfa)
     elif s[0] == '(':
-        index_rp, p_nfa = read_parentheses(s[1:], nfa)
+        index_rp, p_nfa = read_parentheses(s[1:], alphabet, nfa)
         # consider the left parentheses
         index_rp += 1
         if len(s) >= index_rp + 2 and s[index_rp + 1] == '*':
@@ -182,10 +182,10 @@ def trans_RE_to_NFA(re):
     """
     return _trans_RE_to_NFA(re.s, re.alphabet)
 
-def add_parenthese_repeat(s):
-    return _add_parenthese_repeat(s, 0)
+def add_parentheses_repeat(s):
+    return _add_parentheses_repeat(s, 0)
 
-def _add_parenthese_repeat(s, index):
+def _add_parentheses_repeat(s, index):
     if not s:
         return s
 
@@ -198,28 +198,11 @@ def _add_parenthese_repeat(s, index):
     if new_r_index >= 2 and s[new_r_index - 1] != ')':
         return (s[0 : new_r_index - 1] + '('
                                      + s[new_r_index - 1] + ')*'
-                                     + add_parenthese_repeat(s[new_r_index + 1:]))
+                                     + add_parentheses_repeat(s[new_r_index + 1:]))
 
     if new_r_index >= 1 and s[new_r_index - 1] != ')':
         return ('(' + s[0 : new_r_index] + ')*'
-<<<<<<< Updated upstream
-                    + add_parathese_repeat(s[new_r_index + 1:]))
-
-if __name__ == '__main__':
-    # alphabet = ['a', 'b']
-
-    # regualar_string = '(b)* | a'
-    regular_string = 'aaaa | b*'
-    print('before add parethese : {}'.format(regular_string))
-    print('after adding parethese : {}'.format(add_parathese_repeat(regular_string)))
-    alphabet = list(set([word for word in regular_string
-                         if word.isalpha() or word.isdigit()]))
-    re = RE(alphabet, add_parathese_repeat(regular_string))
-
-    nfa = trans_RE_to_NFA(re)
-    print(nfa)
-=======
-                    + add_parenthese_repeat(s[new_r_index + 1:]))
+                    + add_parentheses_repeat(s[new_r_index + 1:]))
     
     return s
 
@@ -229,22 +212,14 @@ if __name__ == '__main__':
         for line in f.readlines():
             regular_string = line.replace('\n', '')
             print('test {}'.format(str(count)))
-            print('before add parenthese : {}'.format(regular_string))
-            print('after adding parenthese : {}'.format(add_parenthese_repeat(regular_string)))
+            print('before add parethese : {}'.format(regular_string))
+            print('after adding parethese : {}'.format(add_parentheses_repeat(regular_string)))
 
             alphabet = list(set([word for word in regular_string
                                 if word.isalpha() or word.isdigit()]))
-            re = RE(alphabet, add_parenthese_repeat(regular_string))
+            re = RE(alphabet, add_parentheses_repeat(regular_string))
 
             nfa = trans_RE_to_NFA(re)
-            print('the nfa of {}'.format(add_parenthese_repeat(regular_string)))
+            print('the nfa of {}'.format(add_parentheses_repeat(regular_string)))
             print(nfa)
-
-            # dot = Digraph()
-            # for key in nfa.t_function.keys():
-            #     dot.node('%s'%key, shape="circle")
-            #     for action,node in nfa.t_function[key].keys():
-            #         dot.edges('%s'%action, '%s%s'%key%node)
-            # dot.view()
             count += 1
->>>>>>> Stashed changes
